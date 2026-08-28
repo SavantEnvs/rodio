@@ -1,0 +1,26 @@
+# Additive KAT (known-answer-test) probe: a small, ordinary (non-fuzz, non-sanitized,
+# dynamically-linked) binary that decodes a fixed embedded WAV fixture and asserts exact values
+# computed independently (via Python's stdlib `wave` module against the same file, NOT via
+# rodio itself). mayhem/test.sh treats a non-zero exit / a printed FAIL line as a hard failure.
+#
+# WHY this exists (net-new brief §4): `cargo test` alone is a forbidden sole oracle — the
+# sabotage shim's LD_PRELOAD _exit(0) constructor has been observed to leave `cargo test`/
+# `go test` binaries reporting green with zero actual work done. This probe is a real assertion
+# through a binary the neuter affects: build.sh asserts `file <bin> | grep 'dynamically linked'`
+# as a regression guard (Rust binaries are dynamically linked by default, unlike Go's
+# cgo-stub trick), so a sabotaged run genuinely can't produce the PASS/FAIL lines below.
+#
+# `[workspace]` here for the same reason as mayhem/fuzz/Cargo.toml — this crate must not be
+# folded into the (non-workspace) root rodio package.
+[package]
+name = "rodio-kat"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[dependencies.rodio]
+path = "../.."
+default-features = false
+features = ["wav", "flac", "mp3", "mp4", "vorbis"]
+
+[workspace]

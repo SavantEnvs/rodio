@@ -1,0 +1,38 @@
+# Additive cargo-fuzz crate (rodio ships no fuzz/ dir upstream — net-new port). Targets
+# rodio's public decoder entry point over arbitrary bytes (see fuzz_targets/decode.rs).
+#
+# `[workspace]` with members = ["."] is REQUIRED: the root rodio Cargo.toml is a plain
+# (non-workspace) package, so without this table cargo would try to fold this crate into an
+# implicit workspace rooted at the parent package and error ("current package believes it's in a
+# workspace when it's not"). This also makes `cargo fuzz build` place binaries under THIS crate's
+# own target/ dir (mayhem/fuzz/target/<triple>/release/<name>), not the repo-root target/.
+[package]
+name = "rodio-fuzz"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = "0.4"
+
+[dependencies.rodio]
+path = "../.."
+default-features = false
+# The crate's default decodable formats, backed by symphonia (see rodio's own Cargo.toml
+# feature graph): wav, flac, mp3, mp4 (aac), vorbis (ogg). Deliberately WITHOUT `playback`/
+# `recording`/`pulseaudio` — those pull in cpal, which needs a real audio device and isn't
+# fuzzable (see the harness header comment).
+features = ["wav", "flac", "mp3", "mp4", "vorbis"]
+
+[[bin]]
+name = "decode"
+path = "fuzz_targets/decode.rs"
+test = false
+doc = false
+bench = false
+
+[workspace]
+members = ["."]

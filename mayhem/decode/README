@@ -1,0 +1,15 @@
+Seed corpus for the `decode` Mayhem target (rodio::Decoder::new over arbitrary bytes).
+
+One small valid fixture per format in rodio's default (symphonia-backed) codec set, each the
+smallest file of its format already shipped under rodio's own `assets/` (copied here verbatim,
+not re-encoded — file(1) confirms each is a genuine, unmodified fixture of its format):
+
+  wav_pcm.wav  <- assets/audacity32bit_int.wav  (RIFF/WAVE, 32-bit signed PCM, stereo, 44100 Hz)
+  sample.flac  <- assets/audacity24bit_level8.flac (FLAC, 24-bit, mono, 44.1 kHz)
+  sample.mp3   <- assets/music.mp3              (MPEG-1 Layer III, 44.1 kHz, stereo)
+  sample.m4a   <- assets/RL.m4a                 (ISO Media / AAC-LC, .m4a)
+  sample.ogg   <- assets/beep3.ogg               (Ogg container, Vorbis audio, mono, 44100 Hz)
+
+Every seed here was replayed through the built `/mayhem/decode` binary with `-runs=1` (exit 0)
+and through `-runs=5`/`-runs=100` over the whole directory (exit 0, no hang) before being
+committed — see the net-new brief's "a hanging seed in testsuite/ breaks every run" rule.

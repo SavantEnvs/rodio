@@ -1,0 +1,14 @@
+# Mayhem target: decode — rodio's public decoder entry point (rodio::Decoder::new) over
+# arbitrary bytes, auto-probing WAV/FLAC/MP3/MP4(AAC)/Ogg-Vorbis (the crate's default,
+# symphonia-backed codec set). Built by mayhem/build.sh via cargo-fuzz at /mayhem/decode.
+# Seeds: one small valid fixture per supported format under mayhem/decode/testsuite/
+# (wav_pcm.wav, sample.flac, sample.mp3, sample.m4a, sample.ogg — trimmed copies of rodio's own
+# assets/, see mayhem/decode/testsuite/README for provenance).
+project: savantenvs/rodio
+target: decode
+testsuite:
+  - https://$MAYHEM_DOMAIN/$MAYHEM_PROJECT/$MAYHEM_TARGET/testsuite.tar
+  - file://mayhem/decode/testsuite
+cmds:
+  - cmd: /mayhem/decode
+    libfuzzer: true
